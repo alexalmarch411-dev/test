@@ -1,0 +1,2 @@
+service_account_id      = "<sa-for-cluster>"
+node_service_account_id = "<sa-for-nodes>"

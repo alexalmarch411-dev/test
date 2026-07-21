@@ -1,0 +1,5 @@
+apiVersion: v2
+name: network-policy
+description: Network policies for the app stack
+version: 0.1.0
+type: application

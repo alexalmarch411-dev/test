@@ -1,0 +1,12 @@
+dependencies:
+- name: web
+  repository: file://charts/web
+  version: 0.1.0
+- name: mongodb
+  repository: file://charts/mongodb
+  version: 0.1.0
+- name: network-policy
+  repository: file://charts/network-policy
+  version: 0.1.0
+digest: sha256:2ec0f54089d6e0e0c946c597c56db5c10559dafb282fff22c4174edf21ea382a
+generated: "2026-07-20T12:18:58.382354+03:00"

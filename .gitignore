@@ -1,0 +1,12 @@
+.venv/
+*.tgz
+__pycache__/
+*.pyc
+.DS_Store
+terraform/envs/prod/terraform.tfvars
+*.tfvars
+.env
+*.tfstate
+*.tfstate.*
+kubeconfig
+.terraform/

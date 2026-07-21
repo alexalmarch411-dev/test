@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-web-egress-to-mongo
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Release.Name }}-web
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: {{ .Release.Name }}-mongodb
+      ports:
+        - port: 27017
+          protocol: TCP
+  policyTypes:
+    - Egress

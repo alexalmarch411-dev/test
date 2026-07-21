@@ -1,0 +1,14 @@
+web:
+  replicaCount: 2
+  image:
+    repository: ""
+    tag: latest
+  ingress:
+    host: app.example.com
+
+mongodb:
+  persistence:
+    size: 5Gi
+
+network-policy:
+  enabled: true

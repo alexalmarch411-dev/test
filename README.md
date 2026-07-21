@@ -144,6 +144,3 @@ MongoDB URI формируется динамически из `{{ .Release.Name
 
 export TF_VAR_service_account_id="ajesphqeilslrldhqhsj"
 export TF_VAR_node_service_account_id="ajesphqeilslrldhqhsj"
-
-
-ajesphqeilslrldhqhsj

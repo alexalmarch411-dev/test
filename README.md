@@ -142,5 +142,6 @@ MongoDB URI формируется динамически из `{{ .Release.Name
 
 Проверяет наличие `YC_CLOUD_ID`, `YC_FOLDER_ID`, `YC_TOKEN` перед запуском.
 
-export TF_VAR_service_account_id="ajesphqeilslrldhqhsj"
-export TF_VAR_node_service_account_id="ajesphqeilslrldhqhsj"
+export TF_VAR_service_account_id="sa-id"
+
+export TF_VAR_node_service_account_id="sa-id"

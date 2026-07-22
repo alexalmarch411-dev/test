@@ -38,11 +38,24 @@ case "$MODE" in
     yc container registry configure-docker
     REGISTRY_IMAGE=$(terraform output -raw registry_image)
     cd ../../..
-    docker build --platform linux/amd64 -t "$REGISTRY_IMAGE:latest" app_python
+    docker build --no-cache --platform linux/amd64 \
+      --build-arg BUILD_TIMESTAMP=$(date +%s) \
+      -t "$REGISTRY_IMAGE:latest" app_python
     docker push "$REGISTRY_IMAGE:latest"
     cd "$TF_DIR"
 
-    echo "=== 3. Deploy Helm chart ==="
+    echo "=== 3. Wait for cluster to become reachable ==="
+    ENDPOINT=$(terraform output -raw master_endpoint)
+    for i in $(seq 1 30); do
+      if curl -sk --connect-timeout 5 "${ENDPOINT}/version" >/dev/null 2>&1; then
+        echo "Cluster is reachable"
+        break
+      fi
+      echo "Attempt $i/30 - not yet reachable, waiting 10s..."
+      sleep 10
+    done
+
+    echo "=== 4. Deploy Helm chart ==="
     terraform apply -auto-approve
 
     cd ../../..

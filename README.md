@@ -69,8 +69,6 @@ export YC_CLOUD_ID=$(yc config get cloud-id)
 export YC_FOLDER_ID=$(yc config get folder-id)
 export YC_TOKEN=$(yc iam create-token --impersonate-service-account-id <sa-id>)
 
-cp terraform/envs/prod/terraform.tfvars.example terraform/envs/prod/terraform.tfvars
-vim terraform/envs/prod/terraform.tfvars
 
 ./deploy.sh          # terraform → build → push → restart
 ./deploy.sh destroy  # terraform destroy
@@ -142,6 +140,7 @@ MongoDB URI формируется динамически из `{{ .Release.Name
 
 Проверяет наличие `YC_CLOUD_ID`, `YC_FOLDER_ID`, `YC_TOKEN` перед запуском.
 
+```bash
 export TF_VAR_service_account_id="sa-id"
 
 export TF_VAR_node_service_account_id="sa-id"

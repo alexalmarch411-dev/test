@@ -41,7 +41,13 @@ case "$MODE" in
     docker build --no-cache --platform linux/amd64 \
       --build-arg BUILD_TIMESTAMP=$(date +%s) \
       -t "$REGISTRY_IMAGE:latest" app_python
-    docker push "$REGISTRY_IMAGE:latest"
+    if command -v skopeo &>/dev/null; then
+      skopeo copy docker-daemon:"$REGISTRY_IMAGE:latest" docker://"$REGISTRY_IMAGE:latest"
+    else
+      echo "⚠️  skopeo not found, trying docker push (may fail with cross-repo mount)"
+      echo "   Install: brew install skopeo"
+      docker push "$REGISTRY_IMAGE:latest"
+    fi
     cd "$TF_DIR"
 
     echo "=== 3. Wait for cluster to become reachable ==="
@@ -59,8 +65,21 @@ case "$MODE" in
     terraform apply -auto-approve
 
     cd ../../..
-    echo "=== Done ==="
-    echo "Image: $REGISTRY_IMAGE:latest"
+    echo ""
+    echo "=========================================="
+    echo "  Deploy completed successfully"
+    echo "=========================================="
+    echo ""
+    echo "Cluster:  $(cd terraform/envs/prod && terraform output -raw cluster_name)"
+    echo "Endpoint: $(cd terraform/envs/prod && terraform output -raw master_endpoint)"
+    echo "Image:    $REGISTRY_IMAGE"
+    echo ""
+    echo "Connect:"
+    echo "  yc managed-kubernetes cluster get-credentials prod-cluster --external --force"
+    echo "  kubectl config use-context yc-prod-cluster"
+    echo "  kubectl get pods -n default"
+    echo ""
+    echo "API: kubectl get svc -n default myapp-web"
     ;;
 
   destroy)

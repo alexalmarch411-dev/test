@@ -37,16 +37,17 @@ case "$MODE" in
     echo "=== 2. Auth + Build & Push image ==="
     yc container registry configure-docker
     REGISTRY_IMAGE=$(terraform output -raw registry_image)
+    BUILD_TAG=$(date +%Y%m%d-%H%M%S)
     cd ../../..
     docker build --no-cache --platform linux/amd64 \
       --build-arg BUILD_TIMESTAMP=$(date +%s) \
-      -t "$REGISTRY_IMAGE:latest" app_python
+      -t "$REGISTRY_IMAGE:$BUILD_TAG" app_python
     if command -v skopeo &>/dev/null; then
-      skopeo copy docker-daemon:"$REGISTRY_IMAGE:latest" docker://"$REGISTRY_IMAGE:latest"
+      skopeo copy docker-daemon:"$REGISTRY_IMAGE:$BUILD_TAG" docker://"$REGISTRY_IMAGE:$BUILD_TAG"
     else
       echo "⚠️  skopeo not found, trying docker push (may fail with cross-repo mount)"
       echo "   Install: brew install skopeo"
-      docker push "$REGISTRY_IMAGE:latest"
+      docker push "$REGISTRY_IMAGE:$BUILD_TAG"
     fi
     cd "$TF_DIR"
 
@@ -62,7 +63,11 @@ case "$MODE" in
     done
 
     echo "=== 4. Deploy Helm chart ==="
-    terraform apply -auto-approve
+    terraform apply -auto-approve -var image_tag="$BUILD_TAG"
+
+    echo "=== 5. Rollout restart ==="
+    kubectl rollout restart deployment -n default myapp-web 2>/dev/null || true
+    kubectl rollout status deployment -n default myapp-web --timeout=120s 2>/dev/null || true
 
     cd ../../..
     echo ""
@@ -72,7 +77,7 @@ case "$MODE" in
     echo ""
     echo "Cluster:  $(cd terraform/envs/prod && terraform output -raw cluster_name)"
     echo "Endpoint: $(cd terraform/envs/prod && terraform output -raw master_endpoint)"
-    echo "Image:    $REGISTRY_IMAGE"
+    echo "Image:    $REGISTRY_IMAGE:$BUILD_TAG"
     echo ""
     echo "Connect:"
     echo "  yc managed-kubernetes cluster get-credentials prod-cluster --external --force"
@@ -80,6 +85,9 @@ case "$MODE" in
     echo "  kubectl get pods -n default"
     echo ""
     echo "API: kubectl get svc -n default myapp-web"
+    echo ""
+    echo "Rollback:"
+    echo "  cd $TF_DIR && terraform apply -auto-approve -var image_tag=<previous-tag>"
     ;;
 
   destroy)

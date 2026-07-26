@@ -68,6 +68,12 @@ variable "node_count" {
   default     = 3
 }
 
+variable "image_tag" {
+  description = "Docker image tag to deploy"
+  type        = string
+  default     = "latest"
+}
+
 variable "preemptible" {
   description = "Use preemptible instances"
   type        = bool

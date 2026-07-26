@@ -80,5 +80,10 @@ resource "helm_release" "app" {
     value = "cr.yandex/${yandex_container_registry.app.id}/app_python-app"
   }
 
+  set {
+    name  = "web.image.tag"
+    value = var.image_tag
+  }
+
   timeout = 600
 }

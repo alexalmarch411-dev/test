@@ -120,6 +120,13 @@ resource "yandex_vpc_security_group" "k8s_nodes" {
     description       = "Allow kubelet from master"
   }
 
+  ingress {
+    protocol          = "TCP"
+    port              = 0
+    security_group_id = yandex_vpc_security_group.k8s_master.id
+    description       = "Allow all traffic from master to nodes"
+  }
+
   egress {
     protocol       = "ANY"
     v4_cidr_blocks = ["0.0.0.0/0"]

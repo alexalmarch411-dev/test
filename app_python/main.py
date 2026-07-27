@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.errors import ConnectionFailure, OperationFailure
 from fastapi.responses import JSONResponse, Response
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 
@@ -49,7 +50,7 @@ async def health():
         await client.admin.command("ping")
         status, code = "ok", 200
         mongo_up.set(1)
-    except Exception:
+    except (ConnectionFailure, OperationFailure):
         status, code = "error", 503
         mongo_up.set(0)
     finally:

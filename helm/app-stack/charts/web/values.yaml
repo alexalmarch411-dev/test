@@ -1,5 +1,9 @@
 replicaCount: 2
 
+strategy:
+  maxUnavailable: 0
+  maxSurge: 1
+
 image:
   repository: app_python-app
   tag: latest
